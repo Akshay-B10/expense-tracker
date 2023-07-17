@@ -15,10 +15,10 @@ exports.userLogIn = async (req, res) => {
             }
         });
         if (!user) {
-            throw ("Email not exist");
+            return res.sendStatus(404);
         }
         if (user.password !== password) {
-            throw ("Password doesn't match");
+            return res.sendStatus(401);
         }
         res.json(user);
 
