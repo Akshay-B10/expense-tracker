@@ -4,9 +4,13 @@ const User = require("../models/user");
 const { where } = require("sequelize");
 const { error } = require("console");
 
-exports.getIndex = (req, res) => {
+exports.getSignUp = (req, res) => {
     res.sendFile(path.join(__dirname, "../", "views", "signup.html"))
 };
+
+exports.getLogIn = (req, res) => {
+    res.sendFile(path.join(__dirname, "../", "views", "login.html"));
+}
 
 exports.addUser = async (req, res) => {
     try {
