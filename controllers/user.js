@@ -1,4 +1,4 @@
-const path = require("path");
+const bcrypt = require("bcrypt");
 
 const User = require("../models/user");
 
@@ -14,15 +14,30 @@ exports.userLogIn = async (req, res) => {
                 email: email
             }
         });
+        // Invalid email
         if (!user) {
-            return res.sendStatus(404);
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
         }
-        if (user.password !== password) {
-            return res.sendStatus(401);
-        }
-        res.json(user);
 
-    } catch(err) {
-        res.json(err);
+        //Invalid password
+        const result = await bcrypt.compare(password, user.password);
+        if (!result) {
+            return res.status(401).json({
+                success: false,
+                message: "Password incorrect"
+            });
+        }
+        return res.json({
+            success: true,
+            message: "Successfully logged in"
+        });
+    } catch (err) {
+        res.json({
+            success: false,
+            message: err
+        });
     }
 };

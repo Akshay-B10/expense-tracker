@@ -7,19 +7,16 @@ async function userLogIn(event) {
             email: email,
             password: password
         });
-        if (res.data.id) {
-            alert("User logged in");
-        } else {
-            alert(res.data);
-        }
+        alert(res.data.message);
     } catch (err) {
         const form = document.querySelector("form");
-        form.appendChild(document.createTextNode(`Error Code: ${err.response.status}/ Error message: ${err.response.data}`));
+        form.appendChild(document.createTextNode(`Error Code: ${err.response.status}/ Error message: ${err.response.data.message}`));
         setTimeout(() => {
             form.removeChild(form.lastChild);
-        }, 5000);
+        }, 3000);
     }
-}
+};
+
 var baseUrl = "http://localhost:4000"
 
 const btn = document.querySelector(".btn");
