@@ -1,8 +1,8 @@
 const path = require("path");
 
+const bcrypt = require("bcrypt");
+
 const User = require("../models/user");
-const { where } = require("sequelize");
-const { error } = require("console");
 
 exports.getSignUp = (req, res) => {
     res.sendFile(path.join(__dirname, "../", "views", "signup.html"))
@@ -20,15 +20,20 @@ exports.addUser = async (req, res) => {
             }
         });
         if (!user) {
-            const data = await User.create({
-                name: req.body.name,
-                email: req.body.email,
-                password: req.body.password
+            const saltRounds = 10;
+            bcrypt.hash(req.body.password, saltRounds, async (err, hash) => {
+                const data = await User.create({
+                    name: req.body.name,
+                    email: req.body.email,
+                    password: hash
+                });
             });
-            return res.json(data);
+            return res.status(201).json({
+                message: "Successfully created new user"
+            });
         }
         throw ("Email already exist");
-    } catch(err) {
+    } catch (err) {
         res.json(err);
     }
 };
