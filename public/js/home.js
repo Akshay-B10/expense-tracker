@@ -1,7 +1,13 @@
 // Function to get all data
 async function getAllExpenses() {
     try {
-        const res = await axios.get(`${baseUrl}/user/get-all-expenses`);
+        // Token
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`${baseUrl}/user/get-all-expenses`, {
+            headers: {
+                "Authorization": token
+            }
+        });
         const expenses = res.data;
         for (let i = 0; i < expenses.length; i++) {
             displayExpense(expenses[i]);
@@ -52,7 +58,14 @@ async function addExpense(e) {
             expense.amount = expAmt.value;
             expense.desc = desc.value;
             expense.category = category.value;
-            const res = await axios.post(`${baseUrl}/user/add-expense`, expense);
+
+            // Token from local storage
+            const token = localStorage.getItem("token");
+            const res = await axios.post(`${baseUrl}/user/add-expense`, expense, {
+                headers: {
+                    "Authorization": token
+                }
+            });
             displayExpense(res.data);
         }
     } catch (err) {
@@ -67,8 +80,14 @@ async function delExpense(e) {
             if (confirm('Are You Sure?')) {
                 let li = e.target.parentElement;
                 let id = li.getAttribute("value");
+                // Token
+                const token = localStorage.getItem("token");
                 // Remove data from server
-                await axios.get(`${baseUrl}/user/delete-expense?id=${id}`);
+                await axios.get(`${baseUrl}/user/delete-expense?id=${id}`, {
+                    headers: {
+                        "Authorization": token
+                    }
+                });
                 ul.removeChild(li);
             };
         }

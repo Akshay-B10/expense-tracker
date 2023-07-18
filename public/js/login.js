@@ -7,7 +7,7 @@ async function userLogIn(event) {
             email: email,
             password: password
         });
-        console.log(res);
+        localStorage.setItem("token", res.data.token);
         window.location.href = "../user/home";
     } catch (err) {
         const form = document.querySelector("form");
