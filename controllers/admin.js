@@ -14,19 +14,22 @@ exports.getLogIn = (req, res) => {
 
 exports.addUser = async (req, res) => {
     try {
+        const { name, email, password } = req.body;
+        if (name === "" || email === "" || password === "") {
+            throw ("Please fill required credentials");
+        }
         const user = await User.findOne({
             where: {
-                email: req.body.email
+                email: email
             }
         });
         if (!user) {
             const saltRounds = 10;
-            bcrypt.hash(req.body.password, saltRounds, async (err, hash) => {
-                const data = await User.create({
-                    name: req.body.name,
-                    email: req.body.email,
-                    password: hash
-                });
+            const hash = await bcrypt.hash(req.body.password, saltRounds)
+            const user = await User.create({
+                name: name,
+                email: email,
+                password: hash
             });
             return res.status(201).json({
                 message: "Successfully created new user"

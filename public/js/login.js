@@ -7,7 +7,8 @@ async function userLogIn(event) {
             email: email,
             password: password
         });
-        alert(res.data.message);
+        console.log(res);
+        window.location.href = "../user/home";
     } catch (err) {
         const form = document.querySelector("form");
         form.appendChild(document.createTextNode(`Error Code: ${err.response.status}/ Error message: ${err.response.data.message}`));
