@@ -25,7 +25,7 @@ async function onSubmit(event) {
             document.getElementById("password").value = "";
         }
     } catch (err) {
-        alert(err);
+        alert(err.response.data);
     }
 };
 
