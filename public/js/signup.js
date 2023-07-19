@@ -14,15 +14,18 @@ async function onSubmit(event) {
             userDetails.password = password;
 
             const response = await axios.post(`${baseUrl}/add-user`, userDetails);
+            /*
             if (response.data === "Email already exist" || response.data === "Please fill required credentials") {
                 alert(response.data);
             }
+            */
+            alert(response.data.message);
             document.getElementById("name").value = "";
             document.getElementById("email").value = "";
             document.getElementById("password").value = "";
         }
     } catch (err) {
-        console.log(err);
+        alert(err);
     }
 };
 

@@ -8,7 +8,10 @@ async function getAllExpenses() {
                 "Authorization": token
             }
         });
-        const expenses = res.data;
+        const expenses = res.data.expenses;
+        if (!res.data.isPremium) {
+            rzpBtn.style.display = "block";
+        }
         for (let i = 0; i < expenses.length; i++) {
             displayExpense(expenses[i]);
         };
@@ -19,7 +22,7 @@ async function getAllExpenses() {
 
 // Function to display data using DOM
 function displayExpense(expense) {
-    // Displaying users
+    // Displaying expense
     const li = document.createElement("li");
     li.className = "list-group-item";
 
@@ -114,6 +117,40 @@ function editExpense(e) {
     }
 };
 
+// Function for Premium Payment
+async function buyPremium(event) {
+    event.preventDefault();
+    const token = localStorage.getItem("token");
+    const response = await axios.get(`${baseUrl}/buy/premium-membership`, {
+        headers: {
+            "Authorization": token
+        }
+    });
+    // response contains order object and key_id
+    let options = {
+        "key": response.data.key_id,
+        "order_id": response.data.order.id,
+        "handler": async function(res) {
+            await axios.post(`${baseUrl}/buy/update-transaction-status`, {
+                orderId: options.order_id,
+                paymentId: res.razorpay_payment_id
+            }, {
+                headers: {
+                    "Authorization": token
+                }
+            });
+            alert("Congratulations, You are premium user.");
+            rzpBtn.style.display = "none";
+        }
+    };
+    let instance = new Razorpay(options);
+    instance.open();
+    event.preventDefault();
+    instance.on("payment.failed", (err) => {
+        console.log(err); // Some error while payment
+        alert("Something went wrong");
+    });
+};
 
 // Main Code Starts from here ..
 var baseUrl = "http://localhost:4000";
@@ -124,7 +161,7 @@ ul.className = "list-group";
 containerDiv.appendChild(ul);
 
 // Addition of expense
-const addBtn = document.querySelector(".btn");
+const addBtn = document.querySelector("#add-btn");
 addBtn.addEventListener("click", addExpense);
 
 // Deletion of expense
@@ -132,5 +169,9 @@ ul.addEventListener("click", delExpense);
 
 // Edit of expense
 ul.addEventListener("click", editExpense);
+
+// Buy Premium
+const rzpBtn = document.querySelector("#rzp-btn");
+rzpBtn.addEventListener("click", buyPremium);
 
 window.addEventListener("DOMContentLoaded", getAllExpenses);

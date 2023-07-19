@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Expenses = require("../models/expenses");
 
-const secretKey = "shhhh";
+const secretKey = process.env.SECRET_TOKEN;
 
 function generateToken(id) {
     return jwt.sign({
@@ -18,7 +18,7 @@ exports.userLogIn = async (req, res) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
-        if (email === "" || password === "") {
+        if (email == "" || password == "") {
             throw ("Please enter required credentials");
         }
         const user = await User.findOne({
@@ -51,7 +51,7 @@ exports.userLogIn = async (req, res) => {
             token: generateToken(user.id)
         });
     } catch (err) {
-        res.json({
+        res.status(500).json({
             success: false,
             message: err
         });
@@ -76,7 +76,7 @@ exports.addExpense = async (req, res) => {
             description: expense.description,
             category: expense.category
         });
-    } catch(err) {
+    } catch (err) {
         res.status(500).json({
             success: false,
             message: "Something went wrong"
@@ -91,8 +91,11 @@ exports.getAllExpenses = async (req, res) => {
                 userId: req.user.id
             }
         });
-        res.json(expenses);
-    } catch(err) {
+        res.json({
+            expenses,
+            isPremium: req.user.isPremium
+        });
+    } catch (err) {
         console.log(err);
     }
 };
@@ -102,7 +105,7 @@ exports.deleteExpense = async (req, res) => {
         const id = req.query.id;
         const expense = await Expenses.findByPk(id);
         if (expense.userId !== req.user.id) {
-            throw("Expense cannot be deleted");
+            throw ("Expense cannot be deleted");
         }
         await expense.destroy();
         res.redirect("/user/home");

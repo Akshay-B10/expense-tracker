@@ -1,5 +1,7 @@
 const path = require("path");
 
+require("dotenv").config();
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -10,6 +12,7 @@ const userRoutes = require("./routes/user");
 
 const User = require("./models/user");
 const Expenses = require("./models/expenses");
+const Order = require("./models/order");
 
 const app = express();
 
@@ -28,6 +31,11 @@ Expenses.belongsTo(User, {
     constraints: true,
     onDelete: "CASCADE"
 });
+User.hasMany(Order);
+Order.belongsTo(User, {
+    constraints: true,
+    onDelete: "CASCADE"
+})
 
 
 sequelize
