@@ -71,11 +71,10 @@ exports.addExpense = async (req, res) => {
             category: category,
             userId: req.user.id
         });
-        res.json({
-            amount: expense.amount,
-            description: expense.description,
-            category: expense.category
+        req.user.update({
+            totalAmount: req.user.totalAmount + +amount
         });
+        res.json(expense);
     } catch (err) {
         res.status(500).json({
             success: false,
@@ -107,6 +106,9 @@ exports.deleteExpense = async (req, res) => {
         if (expense.userId !== req.user.id) {
             throw ("Expense cannot be deleted");
         }
+        req.user.update({
+            totalAmount: req.user.totalAmount - +expense.amount
+        });
         await expense.destroy();
         res.redirect("/user/home");
     } catch (err) {

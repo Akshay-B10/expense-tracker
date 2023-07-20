@@ -197,9 +197,10 @@ async function helperToShowLeaderboard() {
     for (let i = 0; i < users.length; i++) {
         const userLi = document.createElement("li");
         userLi.className = "list-group-item list-group-item-light";
-        userLi.appendChild(document.createTextNode(`Total amount of ${users[i].name} is ${users[i].totalAmount || 0}`));
+        userLi.appendChild(document.createTextNode(`Name: ${users[i].name} Total Amount: ${users[i].totalAmount || 0}`));
         leaderboardUl.appendChild(userLi);
     };
+    document.getElementById("leaderboard-btn").removeEventListener("click", showLeaderboard);
 };
 
 // Main Code Starts from here ..

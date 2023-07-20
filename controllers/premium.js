@@ -7,20 +7,10 @@ exports.showLeaderBoard = async (req, res) => {
         attributes: [
             "id",
             "name",
-            [sequelize.fn("sum", sequelize.col("amount")), "totalAmount"]
+            "totalAmount"
         ],
-        include: [
-            {
-                model: Expenses,
-                attributes:[]
-            }
-        ],
-        group: "user.id", // since user table has all id's; it is group by user.id
         order: [
-            [
-            "totalAmount",
-            "DESC"
-            ]
+            ["totalAmount", "DESC"]
         ]
     });
     res.json(resData);
