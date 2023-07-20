@@ -11,6 +11,13 @@ async function getAllExpenses() {
         const expenses = res.data.expenses;
         if (!res.data.isPremium) {
             rzpBtn.style.display = "block";
+        } else {
+            rzpBtn.nextElementSibling.style.display = "inline-block";
+
+            // Displaying show leaderboard button (Premium Feature)
+            const leaderboardBtn = document.getElementById("leaderboard-btn");
+            leaderboardBtn.style.display = "inline-block";
+            leaderboardBtn.addEventListener("click", showLeaderboard);
         }
         for (let i = 0; i < expenses.length; i++) {
             displayExpense(expenses[i]);
@@ -70,6 +77,13 @@ async function addExpense(e) {
                 }
             });
             displayExpense(res.data);
+
+            if (rzpBtn.style.display === "none") {
+                if (containerDiv.lastElementChild.className === "list-group") {
+                    containerDiv.removeChild(containerDiv.lastElementChild);
+                }
+                helperToShowLeaderboard();
+            }
         }
     } catch (err) {
         console.log(err);
@@ -130,7 +144,7 @@ async function buyPremium(event) {
     let options = {
         "key": response.data.key_id,
         "order_id": response.data.order.id,
-        "handler": async function(res) {
+        "handler": async function (res) {
             await axios.post(`${baseUrl}/buy/update-transaction-status`, {
                 orderId: options.order_id,
                 paymentId: res.razorpay_payment_id
@@ -141,6 +155,10 @@ async function buyPremium(event) {
             });
             alert("Congratulations, You are premium user.");
             rzpBtn.style.display = "none";
+            rzpBtn.nextElementSibling.style.display = "inline-block";
+            const leaderboardBtn = document.getElementById("leaderboard-btn");
+            leaderboardBtn.style.display = "inline-block";
+            leaderboardBtn.addEventListener("click", showLeaderboard);
         }
     };
     let instance = new Razorpay(options);
@@ -150,6 +168,30 @@ async function buyPremium(event) {
         console.log(err); // Some error while payment
         alert("Something went wrong");
     });
+};
+
+// Function Show Leaderboard
+function showLeaderboard(event) {
+    event.preventDefault();
+    helperToShowLeaderboard();
+};
+
+async function helperToShowLeaderboard() {
+    if (!ul.nextSibling){
+        containerDiv.appendChild(document.createElement("h1").appendChild(document.createTextNode("Leaderboard")));
+    }
+    const leaderboardUl = document.createElement("ul");
+    leaderboardUl.className = "list-group";
+    containerDiv.appendChild(leaderboardUl);
+    const res = await axios.get(`${baseUrl}/user/premium/show-leaderboard`);
+    const users = res.data;
+    // users --> array of objects contains name and their total amount
+    for (let i = 0; i < users.length; i++) {
+        const userLi = document.createElement("li");
+        userLi.className = "list-group-item list-group-item-light";
+        userLi.appendChild(document.createTextNode(`Total amount of ${users[i].name} is ${users[i].totalAmount}`));
+        leaderboardUl.appendChild(userLi);
+    };
 };
 
 // Main Code Starts from here ..

@@ -9,6 +9,7 @@ const cors = require("cors");
 const sequelize = require("./utils/config");
 const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/user");
+const premiumRoutes = require("./routes/premium");
 
 const User = require("./models/user");
 const Expenses = require("./models/expenses");
@@ -21,6 +22,8 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(adminRoutes);
+
+app.use("/user/premium", premiumRoutes);
 
 app.use("/user", userRoutes);
 
