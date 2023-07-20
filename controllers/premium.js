@@ -3,26 +3,25 @@ const User = require("../models/user");
 const sequelize = require("../utils/config");
 
 exports.showLeaderBoard = async (req, res) => {
-    const usersAmount = await Expenses.findAll({
-        attributes:[
-            "userId",
+    const resData = await User.findAll({
+        attributes: [
+            "id",
+            "name",
             [sequelize.fn("sum", sequelize.col("amount")), "totalAmount"]
         ],
-        include: {
-            model: User,
-            attributes: ["name"],
-        },
-        group: "userId",
+        include: [
+            {
+                model: Expenses,
+                attributes:[]
+            }
+        ],
+        group: "user.id", // since user table has all id's; it is group by user.id
         order: [
-            ["totalAmount", "DESC"]
+            [
+            "totalAmount",
+            "DESC"
+            ]
         ]
     });
-    const resData = [];
-    for (let i = 0; i < usersAmount.length; i++) {
-        const details = {};
-        details.totalAmount = usersAmount[i].dataValues.totalAmount;
-        details.name = usersAmount[i].user.name;
-        resData.push(details);
-    }
     res.json(resData);
 };

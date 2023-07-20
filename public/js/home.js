@@ -106,6 +106,12 @@ async function delExpense(e) {
                     }
                 });
                 ul.removeChild(li);
+                if (rzpBtn.style.display === "none") {
+                    if (containerDiv.lastElementChild.className === "list-group") {
+                        containerDiv.removeChild(containerDiv.lastElementChild);
+                    }
+                    helperToShowLeaderboard();
+                }
             };
         }
     } catch (err) {
@@ -177,8 +183,10 @@ function showLeaderboard(event) {
 };
 
 async function helperToShowLeaderboard() {
-    if (!ul.nextSibling){
-        containerDiv.appendChild(document.createElement("h1").appendChild(document.createTextNode("Leaderboard")));
+    if (!ul.nextElementSibling) {
+        const leaderboardHead = document.createElement("h2");
+        leaderboardHead.appendChild(document.createTextNode("Leaderboard"));
+        containerDiv.appendChild(leaderboardHead);
     }
     const leaderboardUl = document.createElement("ul");
     leaderboardUl.className = "list-group";
@@ -189,7 +197,7 @@ async function helperToShowLeaderboard() {
     for (let i = 0; i < users.length; i++) {
         const userLi = document.createElement("li");
         userLi.className = "list-group-item list-group-item-light";
-        userLi.appendChild(document.createTextNode(`Total amount of ${users[i].name} is ${users[i].totalAmount}`));
+        userLi.appendChild(document.createTextNode(`Total amount of ${users[i].name} is ${users[i].totalAmount || 0}`));
         leaderboardUl.appendChild(userLi);
     };
 };
