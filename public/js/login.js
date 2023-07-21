@@ -18,8 +18,15 @@ async function userLogIn(event) {
     }
 };
 
+function getEmailSubmitForm() {
+    window.location.href = "../password";
+};
+
+// Main code
+
 var baseUrl = "http://localhost:4000"
 
 const btn = document.querySelector(".btn");
-
 btn.addEventListener("click", userLogIn);
+
+document.querySelector("#forgot-password-btn").addEventListener("click", getEmailSubmitForm);
