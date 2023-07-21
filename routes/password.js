@@ -6,6 +6,6 @@ const passwordController = require("../controllers/password");
 
 router.get("/", passwordController.getFormToSubmitEmail);
 
-router.post("/forgot-password", passwordController.forgotPassword);
+router.post("/forgot-password", passwordController.sendMailToUser);
 
 module.exports = router;

@@ -1,9 +1,13 @@
 async function forgotPassword(event) {
-    event.preventDefault();
-    const email = document.getElementById("email").value;
-    axios.post(`${baseUrl}/password/forgot-password`, {
-        email: email
-    });
+    try {
+        event.preventDefault();
+        const email = document.getElementById("email").value;
+        await axios.post(`${baseUrl}/password/forgot-password`, {
+            email: email
+        });
+    } catch (err) {
+        alert(err.response.data);
+    }
 };
 
 //Main code
