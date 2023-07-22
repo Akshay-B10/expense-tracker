@@ -18,6 +18,9 @@ async function getAllExpenses() {
             const leaderboardBtn = document.getElementById("leaderboard-btn");
             leaderboardBtn.style.display = "inline-block";
             leaderboardBtn.addEventListener("click", showLeaderboard);
+
+            document.getElementById("download-report").disabled = false;
+            document.getElementById("download-report").addEventListener("click", downloadReport); // Download report functional
         }
         for (let i = 0; i < expenses.length; i++) {
             displayExpense(expenses[i]);
@@ -77,8 +80,7 @@ async function addExpense(e) {
                 }
             });
             displayExpense(res.data);
-
-            if (rzpBtn.style.display === "none") {
+            if (rzpBtn.style.display === "none" && containerDiv.lastElementChild.lastElementChild.classList.contains("list-group-item-light")) {
                 if (containerDiv.lastElementChild.className === "list-group") {
                     containerDiv.removeChild(containerDiv.lastElementChild);
                 }
@@ -106,7 +108,7 @@ async function delExpense(e) {
                     }
                 });
                 ul.removeChild(li);
-                if (rzpBtn.style.display === "none") {
+                if (rzpBtn.style.display === "none" && containerDiv.lastElementChild.lastElementChild.classList.contains("list-group-item-light")) {
                     if (containerDiv.lastElementChild.className === "list-group") {
                         containerDiv.removeChild(containerDiv.lastElementChild);
                     }
@@ -134,6 +136,28 @@ function editExpense(e) {
                 li.parentElement.removeChild(li);
             })
             .catch((err) => console.log(err));
+    }
+};
+
+async function downloadReport(event) {
+    try {
+        event.preventDefault();
+        console.log("in download report");
+        const res = await axios.get(`${baseUrl}/user/download`, {
+            headers: {
+                "Authorization": token
+            }
+        });
+        if (res.status == 201) {
+            const a = document.createElement("a");
+            a.href = res.data.fileUrl;
+            a.download = "expense.csv";
+            a.click();
+        } else {
+            throw (res.data.message);
+        }
+    } catch (err) {
+        console.log(err);
     }
 };
 
@@ -165,6 +189,9 @@ async function buyPremium(event) {
             const leaderboardBtn = document.getElementById("leaderboard-btn");
             leaderboardBtn.style.display = "inline-block";
             leaderboardBtn.addEventListener("click", showLeaderboard);
+
+            document.getElementById("download-report").disabled = false;
+            document.getElementById("download-report").addEventListener("click", downloadReport); // Download Functional
         }
     };
     let instance = new Razorpay(options);
@@ -205,6 +232,7 @@ async function helperToShowLeaderboard() {
 
 // Main Code Starts from here ..
 var baseUrl = "http://localhost:4000";
+const token = localStorage.getItem("token");
 
 const containerDiv = document.querySelector(".container");
 const ul = document.createElement("ul");
