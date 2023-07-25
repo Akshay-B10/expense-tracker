@@ -25,6 +25,12 @@ async function getAllExpenses() {
         for (let i = 0; i < expenses.length; i++) {
             displayExpense(expenses[i]);
         };
+
+        const downloads = res.data.downloads;
+        for (let i = 0; i < downloads.length; i++) {
+            showDownload(downloads[i]);
+        };
+        
     } catch (err) {
         console.log(err)
     }
@@ -139,10 +145,40 @@ function editExpense(e) {
     }
 };
 
+function showDownload(download) {
+    if (downloadUl.previousElementSibling.style.display == "none") {
+        downloadUl.previousElementSibling.style.display = "block";
+    }
+    const li = document.createElement("li");
+    li.className = "list-group-item list-group-item-info";
+    li.setAttribute("value", download.id);
+    li.appendChild(document.createTextNode(`${download.createdAt.slice(0, 10)}`));
+
+    // Show download button
+    const delBtn = document.createElement("input");
+    delBtn.setAttribute("type", "button");
+    delBtn.setAttribute("value", "download");
+    delBtn.className = "btn btn-outline-light btn-sm mx-3";
+    li.appendChild(delBtn);
+
+    downloadUl.appendChild(li);
+};
+
+async function downloadPrevReport(event) {
+    if (event.target.classList.contains("btn-outline-light")) {
+        const li = event.target.parentElement;
+        const id = li.getAttribute("value");
+        const res = await axios.get(`${baseUrl}/user/prev/download?id=${id}`);
+        const a = document.createElement("a");
+        a.href = res.data.fileUrl;
+        a.download = "expense.csv";
+        a.click();
+    }
+};
+
 async function downloadReport(event) {
     try {
         event.preventDefault();
-        console.log("in download report");
         const res = await axios.get(`${baseUrl}/user/download`, {
             headers: {
                 "Authorization": token
@@ -153,6 +189,9 @@ async function downloadReport(event) {
             a.href = res.data.fileUrl;
             a.download = "expense.csv";
             a.click();
+
+            // Show in downloads
+            showDownload(res.data.download);
         } else {
             throw (res.data.message);
         }
@@ -234,7 +273,7 @@ async function helperToShowLeaderboard() {
 var baseUrl = "http://localhost:4000";
 const token = localStorage.getItem("token");
 
-const containerDiv = document.querySelector(".container");
+const containerDiv = document.querySelector("#main-div");
 const ul = document.createElement("ul");
 ul.className = "list-group";
 containerDiv.appendChild(ul);
@@ -252,5 +291,9 @@ ul.addEventListener("click", editExpense);
 // Buy Premium
 const rzpBtn = document.querySelector("#rzp-btn");
 rzpBtn.addEventListener("click", buyPremium);
+
+// For downloads
+const downloadUl = document.querySelector("#download-div").lastElementChild;
+downloadUl.addEventListener("click", downloadPrevReport);
 
 window.addEventListener("DOMContentLoaded", getAllExpenses);

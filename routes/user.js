@@ -15,4 +15,8 @@ router.get("/get-all-expenses", userAuth.authenticate, userController.getAllExpe
 
 router.get("/delete-expense", userAuth.authenticate, userController.deleteExpense);
 
+router.get("/download", userAuth.authenticate, userController.downloadReport);
+
+router.get("/prev/download", userController.downloadPrevReport);
+
 module.exports = router;

@@ -8,7 +8,7 @@
 </head>
 
 <body data-bs-theme="dark">
-    <div class="container">
+    <div class="container" id="main-div">
         <form>
             <div class="row">
                 <h1 class="text-center">Expense Tracker</h1>
@@ -43,6 +43,11 @@
         <p style="display: none;">You are a Premium User.</p>
         <button class="btn btn-light" style="display: none;" id="leaderboard-btn">Show leaderboard</button>
         <button class="btn btn-light mt-3 mb-3" id="download-report" style="display: block;" disabled>Download Report</button>
+    </div>
+    <div class="container" id="download-div">
+        <h2 style="display: none;">Previously downloaded</h2>
+        <ul class="list-group">
+        </ul>
     </div>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js">

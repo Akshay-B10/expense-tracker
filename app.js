@@ -16,6 +16,7 @@ const User = require("./models/user");
 const Expenses = require("./models/expenses");
 const Order = require("./models/order");
 const ForgotPasswordRequest = require("./models/forgot-password");
+const Downloads = require("./models/downloads");
 
 const app = express();
 
@@ -45,6 +46,11 @@ Order.belongsTo(User, {
 });
 User.hasMany(ForgotPasswordRequest);
 ForgotPasswordRequest.belongsTo(User, {
+    constraints: true,
+    onDelete: "CASCADE"
+});
+User.hasMany(Downloads);
+Downloads.belongsTo(User, {
     constraints: true,
     onDelete: "CASCADE"
 });

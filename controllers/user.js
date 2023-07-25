@@ -6,6 +6,10 @@ const sequelize = require("../utils/config");
 
 const User = require("../models/user");
 const Expenses = require("../models/expenses");
+const Downloads = require("../models/downloads");
+
+const UserServices = require("../services/user-services");
+const S3Services = require("../services/S3-services");
 
 const secretKey = process.env.SECRET_TOKEN;
 
@@ -106,8 +110,14 @@ exports.getAllExpenses = async (req, res) => {
                 userId: req.user.id
             }
         });
+        const downloads = await Downloads.findAll({
+            where: {
+                userId: req.user.id
+            }
+        });
         res.json({
             expenses,
+            downloads,
             isPremium: req.user.isPremium
         });
     } catch (err) {
@@ -144,6 +154,47 @@ exports.deleteExpense = async (req, res) => {
     } catch (err) {
         res.status(500).json({
             message: err
+        });
+    }
+};
+
+exports.downloadPrevReport = async (req, res) => {
+    try {
+        const id = req.query.id;
+        const download = await Downloads.findByPk(id);
+        res.json({
+            success: true,
+            fileUrl : download.fileUrl
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "Something went wrong",
+            success: false
+        });
+    }
+}
+
+exports.downloadReport = async (req, res) => {
+    try {
+        const id = req.user.id;
+        const expenses = await UserServices.getUserExpenses(req);
+        const stringifiedExpenses = JSON.stringify(expenses);
+        const fileName = `expenses${id}_${new Date}.txt`;
+        const fileUrl = await S3Services.uploadToS3(fileName, stringifiedExpenses);
+        const download = await Downloads.create({
+            fileUrl: fileUrl,
+            userId: id
+        });
+        res.status(201).json({
+            success: true,
+            fileUrl: fileUrl,
+            download
+        });
+    } catch (err) {
+        res.status(500).json({
+            err,
+            message: "Something went wrong",
+            success: false
         });
     }
 };
