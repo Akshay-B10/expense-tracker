@@ -8,7 +8,6 @@ async function getAllExpenses() {
                 "Authorization": token
             }
         });
-        const expenses = res.data.expenses;
         if (!res.data.isPremium) {
             rzpBtn.style.display = "block";
         } else {
@@ -22,15 +21,13 @@ async function getAllExpenses() {
             document.getElementById("download-report").disabled = false;
             document.getElementById("download-report").addEventListener("click", downloadReport); // Download report functional
         }
+        const expenses = res.data.expenses;
         for (let i = 0; i < expenses.length; i++) {
             displayExpense(expenses[i]);
         };
-
-        const downloads = res.data.downloads;
-        for (let i = 0; i < downloads.length; i++) {
-            showDownload(downloads[i]);
-        };
         
+        pagination();
+
     } catch (err) {
         console.log(err)
     }
@@ -143,6 +140,65 @@ function editExpense(e) {
             })
             .catch((err) => console.log(err));
     }
+};
+
+function pageButton(lastPage, prevPage, currentPage, nextPage) {
+    const downloadDiv = document.querySelector("#download-div");
+    if (prevPage >= 1) {
+        const ppBtn = document.createElement("input");
+        ppBtn.setAttribute("type", "button");
+        ppBtn.setAttribute("value", prevPage);
+        ppBtn.className = "btn btn-outline-light btn-sm mx-3";
+        ppBtn.addEventListener("click", helperPagination);
+        downloadDiv.appendChild(ppBtn);
+    }
+    const cpBtn = document.createElement("input");
+    cpBtn.setAttribute("type", "button");
+    cpBtn.setAttribute("value", currentPage);
+    cpBtn.className = "btn btn-outline-light btn-md";
+    downloadDiv.appendChild(cpBtn);
+    if (nextPage <= lastPage) {
+        const npBtn = document.createElement("input");
+        npBtn.setAttribute("type", "button");
+        npBtn.setAttribute("value", nextPage);
+        npBtn.className = "btn btn-outline-light btn-sm mx-3";
+        npBtn.addEventListener("click", helperPagination);
+        downloadDiv.appendChild(npBtn);
+    }
+};
+
+function helperPagination(event) {
+    const page = event.target.getAttribute("value");
+    while (downloadUl.nextElementSibling) {
+        downloadUl.nextElementSibling.removeEventListener("click", helperPagination);
+        downloadUl.nextElementSibling.remove();
+    }
+    while (downloadUl.firstElementChild) {
+        downloadUl.firstElementChild.remove();
+    }
+    pagination(page);
+};
+
+async function pagination(pageNo) {
+    const token = localStorage.getItem("token");
+    const res = await axios.get(`${baseUrl}/user/downloads?page=${pageNo || 1}`, {
+        headers: {
+            "Authorization": token
+        }
+    });
+    if (res.data.total === 0) {
+        return;
+    }
+
+    // Downloads UI
+    const downloads = res.data.downloads;
+    for (let i = 0; i < downloads.length; i++) {
+        showDownload(downloads[i]);
+    }
+
+    // Page buttons UI
+    const { lastPage, prevPage, currentPage, nextPage } = res.data;
+    pageButton(lastPage, prevPage, currentPage, nextPage);
 };
 
 function showDownload(download) {

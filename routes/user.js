@@ -17,6 +17,8 @@ router.get("/delete-expense", userAuth.authenticate, userController.deleteExpens
 
 router.get("/download", userAuth.authenticate, userController.downloadReport);
 
+router.get("/downloads", userAuth.authenticate, userController.showLimitedDownloads);
+
 router.get("/prev/download", userController.downloadPrevReport);
 
 module.exports = router;

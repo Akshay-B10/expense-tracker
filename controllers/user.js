@@ -110,14 +110,8 @@ exports.getAllExpenses = async (req, res) => {
                 userId: req.user.id
             }
         });
-        const downloads = await Downloads.findAll({
-            where: {
-                userId: req.user.id
-            }
-        });
         res.json({
             expenses,
-            downloads,
             isPremium: req.user.isPremium
         });
     } catch (err) {
@@ -195,6 +189,39 @@ exports.downloadReport = async (req, res) => {
             err,
             message: "Something went wrong",
             success: false
+        });
+    }
+};
+
+exports.showLimitedDownloads = async (req, res) => {
+    try {
+        const limit = 2;
+        const page = req.query.page;
+        const downloads = await Downloads.findAndCountAll({
+            offset: (page - 1) * limit,
+            limit: limit,
+            order: [
+                ["createdAt", "DESC"]
+            ]
+        } ,{
+            where: {
+                userId: req.user.id
+            }
+        });
+        const lastPage = Math.ceil(downloads.count / limit);
+        const prevPage = +page - 1;
+        const nextPage = +page + 1;
+        res.json({
+            downloads: downloads.rows,
+            lastPage: lastPage,
+            prevPage: prevPage,
+            currentPage: +page,
+            nextPage: nextPage,
+            total: downloads.count
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "Something went wrong"
         });
     }
 };
