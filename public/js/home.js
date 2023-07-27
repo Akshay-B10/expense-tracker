@@ -20,13 +20,16 @@ async function getAllExpenses() {
 
             document.getElementById("download-report").disabled = false;
             document.getElementById("download-report").addEventListener("click", downloadReport); // Download report functional
+            pagination();
+            
+            selectEle.parentElement.style.display = "block";
+            selectEle.addEventListener("change", setDownloadsPerPage);
         }
         const expenses = res.data.expenses;
         for (let i = 0; i < expenses.length; i++) {
             displayExpense(expenses[i]);
         };
         
-        pagination();
 
     } catch (err) {
         console.log(err)
@@ -142,6 +145,11 @@ function editExpense(e) {
     }
 };
 
+function setDownloadsPerPage() {
+    localStorage.setItem("rowsPerPage", selectEle.value);
+    pagination();
+}
+
 function pageButton(lastPage, prevPage, currentPage, nextPage) {
     const downloadDiv = document.querySelector("#download-div");
     if (prevPage >= 1) {
@@ -169,6 +177,10 @@ function pageButton(lastPage, prevPage, currentPage, nextPage) {
 
 function helperPagination(event) {
     const page = event.target.getAttribute("value");
+    pagination(page);
+};
+
+async function pagination(pageNo) {
     while (downloadUl.nextElementSibling) {
         downloadUl.nextElementSibling.removeEventListener("click", helperPagination);
         downloadUl.nextElementSibling.remove();
@@ -176,12 +188,9 @@ function helperPagination(event) {
     while (downloadUl.firstElementChild) {
         downloadUl.firstElementChild.remove();
     }
-    pagination(page);
-};
-
-async function pagination(pageNo) {
     const token = localStorage.getItem("token");
-    const res = await axios.get(`${baseUrl}/user/downloads?page=${pageNo || 1}`, {
+    const rowsPerPage = localStorage.getItem("rowsPerPage");
+    const res = await axios.get(`${baseUrl}/user/downloads?page=${pageNo || 1}&rowsPerPage=${rowsPerPage || 1}`, {
         headers: {
             "Authorization": token
         }
@@ -351,5 +360,9 @@ rzpBtn.addEventListener("click", buyPremium);
 // For downloads
 const downloadUl = document.querySelector("#download-div").lastElementChild;
 downloadUl.addEventListener("click", downloadPrevReport);
+
+// Previous downloads per page (Premium)
+const selectEle = document.querySelector("#rows-per-page");
+selectEle.value = localStorage.getItem("rowsPerPage") || 1;
 
 window.addEventListener("DOMContentLoaded", getAllExpenses);
