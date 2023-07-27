@@ -46,18 +46,11 @@ function displayExpense(expense) {
     li.setAttribute("value", expense.id);
     li.appendChild(document.createTextNode(`${expense.amount} - ${expense.description} - ${expense.category}`));
 
-    // Add Edit button
-    const editBtn = document.createElement("input");
-    editBtn.setAttribute("type", "button");
-    editBtn.setAttribute("value", "Edit");
-    editBtn.className = "btn btn-outline-primary mx-2";
-    li.appendChild(editBtn);
-
     // Add Delete button
     const delBtn = document.createElement("input");
     delBtn.setAttribute("type", "button");
     delBtn.setAttribute("value", "Delete");
-    delBtn.className = "btn btn-danger";
+    delBtn.className = "btn btn-danger mx-3";
     li.appendChild(delBtn);
     ul.appendChild(li);
 }
@@ -124,24 +117,6 @@ async function delExpense(e) {
         }
     } catch (err) {
         console.log(err);
-    }
-};
-
-// Function to edit expense
-function editExpense(e) {
-    if (e.target.classList.contains("btn-outline-primary")) {
-        let li = e.target.parentElement;
-        let id = li.getAttribute("value");
-        // Remove data from server
-        axios
-            .get(`http://localhost:4000/edit-expense?id=${id}`)
-            .then((res) => {
-                document.querySelector("#expAmt").value = res.data.amount;
-                document.querySelector("#desc").value = res.data.description;
-                document.querySelector("#category").value = res.data.category;
-                li.parentElement.removeChild(li);
-            })
-            .catch((err) => console.log(err));
     }
 };
 
@@ -349,9 +324,6 @@ addBtn.addEventListener("click", addExpense);
 
 // Deletion of expense
 ul.addEventListener("click", delExpense);
-
-// Edit of expense
-ul.addEventListener("click", editExpense);
 
 // Buy Premium
 const rzpBtn = document.querySelector("#rzp-btn");
