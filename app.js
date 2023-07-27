@@ -11,6 +11,7 @@ const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/user");
 const premiumRoutes = require("./routes/premium");
 const passwordRoutes = require("./routes/password");
+const errorController = require("./controllers/error");
 
 const User = require("./models/user");
 const Expenses = require("./models/expenses");
@@ -31,6 +32,8 @@ app.use("/user/premium", premiumRoutes);
 app.use("/user", userRoutes);
 
 app.use("/password", passwordRoutes);
+
+app.use(errorController.getError404);
 
 // Relations
 
@@ -58,6 +61,6 @@ Downloads.belongsTo(User, {
 sequelize
     .sync()
     .then(() => {
-        app.listen(4000)
+        app.listen(Number(process.env.PORT_NUMBER))
     })
     .catch(err => console.log(err));
