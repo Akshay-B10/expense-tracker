@@ -78,6 +78,7 @@ Downloads.belongsTo(User, {
 sequelize
     .sync()
     .then(() => {
+        console.log("This is test for automation");
         app.listen(Number(process.env.PORT_NUMBER))
     })
     .catch(err => console.log(err));
