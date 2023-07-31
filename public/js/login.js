@@ -10,10 +10,10 @@ async function userLogIn(event) {
         localStorage.setItem("token", res.data.token);
         window.location.href = "../user/home";
     } catch (err) {
-        const form = document.querySelector("form");
-        form.appendChild(document.createTextNode(`Error Code: ${err.response.status}/ Error message: ${err.response.data.message}`));
+        const containerDiv = document.querySelector(".container");
+        containerDiv.appendChild(document.createTextNode(`Error Code: ${err.response.status}/ Error message: ${err.response.data.message}`));
         setTimeout(() => {
-            form.removeChild(form.lastChild);
+            containerDiv.removeChild(containerDiv.lastChild);
         }, 3000);
     }
 };

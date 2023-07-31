@@ -140,7 +140,10 @@ exports.deleteExpense = async (req, res) => {
                 transaction: t
             });
             await t.commit();
-            res.redirect("/user/home");
+            res.json({
+                success: true,
+                message: "Deleted"
+            });
         } catch (err) {
             await t.rollback();
             throw err;
