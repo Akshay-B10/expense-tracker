@@ -11,9 +11,9 @@ async function userLogIn(event) {
         window.location.href = "../user/home";
     } catch (err) {
         const form = document.querySelector("form");
-        form.appendChild(document.createTextNode(`Error Code: ${err.response.status}/ Error message: ${err.response.data.message}`));
+        document.querySelector(".container").appendChild(document.createTextNode(`Error Code: ${err.response.status}/ Error message: ${err.response.data.message}`));
         setTimeout(() => {
-            form.removeChild(form.lastChild);
+            document.querySelector(".container").removeChild(document.querySelector(".container").lastChild);
         }, 3000);
     }
 };
@@ -24,7 +24,7 @@ function getEmailSubmitForm() {
 
 // Main code
 
-var baseUrl = "http://localhost:4000"
+var baseUrl = "http://52.87.50.226"
 
 const btn = document.querySelector(".btn");
 btn.addEventListener("click", userLogIn);

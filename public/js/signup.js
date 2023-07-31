@@ -29,7 +29,7 @@ async function onSubmit(event) {
     }
 };
 
-var baseUrl = "http://localhost:4000";
+var baseUrl = "http://52.87.50.226";
 
 const btn = document.querySelector(".btn");
 

@@ -21,6 +21,6 @@ async function submitNewPassword(event) {
 };
 
 // Main code
-var baseUrl = "http://localhost:4000";
+var baseUrl = "http://52.87.50.226";
 
 document.querySelector(".btn").addEventListener("click", submitNewPassword);

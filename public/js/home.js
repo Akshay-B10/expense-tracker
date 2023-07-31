@@ -310,7 +310,7 @@ async function helperToShowLeaderboard() {
 };
 
 // Main Code Starts from here ..
-var baseUrl = "http://localhost:4000";
+var baseUrl = "http://52.87.50.226";
 const token = localStorage.getItem("token");
 
 const containerDiv = document.querySelector("#main-div");
