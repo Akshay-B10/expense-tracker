@@ -7,6 +7,7 @@ const User = require("../models/user");
 const Order = require("../models/order");
 
 exports.getSignUp = (req, res) => {
+    console.log(req.url);
     res.sendFile(path.join(__dirname, "../", "views", "signup.html"))
 };
 
