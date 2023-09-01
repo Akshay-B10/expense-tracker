@@ -18,7 +18,6 @@ const { v4: uuidv4 } = require("uuid");
 
 const User = require("../models/user");
 const ForgotPasswordRequest = require("../models/forgot-password");
-const sequelize = require("../utils/config");
 
 exports.getFormToSubmitEmail = (req, res) => {
     res.sendFile(path.join(__dirname, "../", "views", "forgot-password.html"));
@@ -28,27 +27,28 @@ exports.sendMailToUser = async (req, res) => {
     try {
         const email = req.body.email;
         const user = await User.findOne({
-            where: {
-                email: email
-            }
+            email: email
         });
         if (!user) {
             throw ("User not found");
         };
         const transEmailApi = new Sib.TransactionalEmailsApi();
 
-        const reciever = [
-            {
-                email: email
-            }
-        ];
+        const reciever = [{
+            email: email
+        }];
 
         const uuid = uuidv4(); // Generate random uuid
         // Update data in forgot password req table
-        ForgotPasswordRequest.create({
+        const newRequest = new ForgotPasswordRequest({
             uuid: uuid,
-            userId: req.user.id
+            userId: req.user
         });
+        await newRequest.save();
+        // ForgotPasswordRequest.create({
+        //     uuid: uuid,
+        //     userId: req.user.id
+        // });
         await transEmailApi.sendTransacEmail({
             sender,
             to: reciever,
@@ -71,9 +71,7 @@ exports.uuidValidation = async (req, res) => {
     try {
         const uuid = req.params.uuid;
         const passReq = await ForgotPasswordRequest.findOne({
-            where: {
-                uuid: uuid
-            }
+            uuid: uuid
         });
         if (!passReq) {
             return res.json({
@@ -85,9 +83,11 @@ exports.uuidValidation = async (req, res) => {
                 message: "Link expired"
             });
         }
-        await passReq.update({
-            isActive: false
-        });
+        passReq.isActive = false;
+        await passReq.save();
+        // await passReq.update({
+        //     isActive: false
+        // });
         res.sendFile(path.join(__dirname, "../", "views", "new-password.html"));
     } catch (err) {
         res.status(500).json(err);
@@ -104,13 +104,16 @@ exports.setNewPassword = async (req, res) => {
         }
         const saltRounds = 10;
         const hash = await bcrypt.hash(newPassword, saltRounds);
-        await User.update({
+        await User.findByIdAndUpdate(req.user._id, {
             password: hash
-        }, {
-            where: {
-                id: req.user.id
-            }
         });
+        // await User.update({
+        //     password: hash
+        // }, {
+        //     where: {
+        //         id: req.user.id
+        //     }
+        // });
         res.json({
             succes: true,
             message: "Password changed successfully!"
