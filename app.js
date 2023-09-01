@@ -13,15 +13,9 @@ const cors = require("cors");
 // const sequelize = require("./utils/config");
 const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/user");
-// const premiumRoutes = require("./routes/premium");
+const premiumRoutes = require("./routes/premium");
 // const passwordRoutes = require("./routes/password");
 const errorController = require("./controllers/error");
-
-const User = require("./models/user");
-// const Expenses = require("./models/expenses");
-// const Order = require("./models/order");
-// const ForgotPasswordRequest = require("./models/forgot-password");
-// const Downloads = require("./models/downloads");
 
 const app = express();
 
@@ -45,7 +39,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(adminRoutes);
 
-// app.use("/user/premium", premiumRoutes);
+app.use("/user/premium", premiumRoutes);
 
 app.use("/user", userRoutes);
 
