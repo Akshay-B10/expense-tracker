@@ -43,7 +43,7 @@ function displayExpense(expense) {
     li.className = "list-group-item";
 
     // to access id
-    li.setAttribute("value", expense.id);
+    li.setAttribute("value", expense._id);
     li.appendChild(document.createTextNode(`${expense.amount} - ${expense.description} - ${expense.category}`));
 
     // Add Delete button

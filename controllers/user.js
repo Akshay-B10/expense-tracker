@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
-// const Expenses = require("../models/expenses");
+const Expense = require("../models/expense");
 // const Downloads = require("../models/downloads");
 
 const UserServices = require("../services/user-services");
@@ -64,93 +64,65 @@ exports.userHome = (req, res) => {
     res.sendFile(path.join(__dirname, "../", "views", "home.html"));
 };
 
-// exports.addExpense = async (req, res) => {
-//     try{
-//         const t = await sequelize.transaction();
-//         try {
-//             const { amount, desc, category } = req.body;
-//             const expense = await Expenses.create({
-//                 amount: amount,
-//                 description: desc,
-//                 category: category,
-//                 userId: req.user.id
-//             }, {
-//                 transaction: t
-//             });
-//             await User.update({
-//                 totalAmount: req.user.totalAmount + +amount
-//             }, {
-//                 where: {
-//                     id: req.user.id
-//                 },
-//                 transaction: t
-//             });
-//             await t.commit();
-//             res.json(expense);
-//         } catch (err) {
-//             console.log(err);
-//             await t.rollback();
-//             throw err;
-//         }
-//     } catch (err) {
-//         res.status(500).json({
-//             success: false,
-//             message: "Something went wrong"
-//         });
-//     }
-// };
+exports.addExpense = async (req, res) => {
+    try {
+        const { amount, desc, category } = req.body;
+        const expense = new Expense({
+            amount: amount,
+            description: desc,
+            category: category,
+            userId: req.user
+        });
+        await expense.save();
+        req.user.totalAmount += +amount;
+        await req.user.save();
+        res.json(expense);
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Something went wrong"
+        });
+    }
+};
 
-// exports.getAllExpenses = async (req, res) => {
-//     try {
-//         const expenses = await Expenses.findAll({
-//             where: {
-//                 userId: req.user.id
-//             }
-//         });
-//         res.json({
-//             expenses,
-//             isPremium: req.user.isPremium
-//         });
-//     } catch (err) {
-//         console.log(err);
-//     }
-// };
+exports.getAllExpenses = async (req, res) => {
+    try {
+        const expenses = await Expense.find({
+            userId: req.user._id
+        });
+        res.json({
+            expenses,
+            isPremium: req.user.isPremium
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "Could not fetch expenses"
+        });
+    }
+};
 
-// exports.deleteExpense = async (req, res) => {
-//     try {
-//         const t = await sequelize.transaction();
-//         try {
-//             const id = req.query.id;
-//             const expense = await Expenses.findByPk(id);
-//             if (expense.userId !== req.user.id) {
-//                 throw ("Expense cannot be deleted");
-//             }
-//             await User.update({
-//                 totalAmount: req.user.totalAmount - +expense.amount
-//             }, {
-//                 where: {
-//                     id: req.user.id
-//                 },
-//                 transaction: t
-//             });
-//             await expense.destroy({
-//                 transaction: t
-//             });
-//             await t.commit();
-//             res.json({
-//                 success: true,
-//                 message: "Deleted"
-//             });
-//         } catch (err) {
-//             await t.rollback();
-//             throw err;
-//         }
-//     } catch (err) {
-//         res.status(500).json({
-//             message: err
-//         });
-//     }
-// };
+exports.deleteExpense = async (req, res) => {
+    try {
+        const id = req.query.id;
+        const expense = await Expense.findById(id);
+        console.log(expense.userId);
+        console.log(req.user._id);
+        if (expense.userId.toString() !== req.user._id.toString()) {
+            throw ("Expense cannot be deleted");
+        }
+        await Expense.findByIdAndDelete(id);
+        req.user.totalAmount -= expense.amount;
+        await req.user.save();
+        res.json({
+            success: true,
+            message: "Deleted"
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: err
+        });
+    }
+};
 
 // exports.downloadPrevReport = async (req, res) => {
 //     try {

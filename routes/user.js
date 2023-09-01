@@ -9,11 +9,11 @@ router.post("/login", userController.userLogIn);
 
 router.get("/home", userController.userHome);
 
-// router.post("/add-expense", userAuth.authenticate, userController.addExpense);
+router.post("/add-expense", userAuth.authenticate, userController.addExpense);
 
-// router.get("/get-all-expenses", userAuth.authenticate, userController.getAllExpenses);
+router.get("/get-all-expenses", userAuth.authenticate, userController.getAllExpenses);
 
-// router.get("/delete-expense", userAuth.authenticate, userController.deleteExpense);
+router.get("/delete-expense", userAuth.authenticate, userController.deleteExpense);
 
 // router.get("/download", userAuth.authenticate, userController.downloadReport);
 

@@ -8,7 +8,7 @@ exports.authenticate = async (req, res, next) => {
     try {
         const token = req.header("Authorization");
         const unknownUser = jwt.verify(token, secretKey); // returns object which encrypted using secret key
-        const user = await User.findByPk(unknownUser.userId);
+        const user = await User.findById(unknownUser.userId);
         if (!user) {
             throw("Something went wrong");
         }

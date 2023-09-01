@@ -13,8 +13,8 @@ router.get("/login", adminController.getLogIn);
 
 router.post("/add-user", adminController.addUser);
 
-// router.get("/buy/premium-membership", userAuth.authenticate, adminController.buyPremium);
+router.get("/buy/premium-membership", userAuth.authenticate, adminController.buyPremium);
 
-// router.post("/buy/update-transaction-status", userAuth.authenticate, adminController.updateTransactionDetails);
+router.post("/buy/update-transaction-status", userAuth.authenticate, adminController.updateTransactionDetails);
 
 module.exports = router;
