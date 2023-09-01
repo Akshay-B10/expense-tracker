@@ -2,18 +2,17 @@ const {Sequelize} = require("sequelize");
 
 // const sequelize = require("../utils/config");
 
-// const ForgotPasswordRequest = sequelize.define("forgot-password-request", {
+// const Downloads = sequelize.define("downloads", {
 //     id: {
 //         type: Sequelize.INTEGER,
 //         allowNull: false,
 //         autoIncrement: true,
 //         primaryKey: true
 //     },
-//     uuid: Sequelize.STRING,
-//     isActive: {
-//         type: Sequelize.BOOLEAN,
-//         defaultValue: true
-//     }
+//     fileUrl: {
+//         type: Sequelize.STRING,
+//         allowNull: false,
+//     },
 // });
 
-// module.exports = ForgotPasswordRequest;
+// module.exports = Downloads;

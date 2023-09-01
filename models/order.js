@@ -1,17 +1,17 @@
 const {Sequelize} = require("sequelize");
 
-const sequelize = require("../utils/config");
+// const sequelize = require("../utils/config");
 
-const Order = sequelize.define("order", {
-    id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        allowNull: false,
-        primaryKey: true
-    },
-    orderId: Sequelize.STRING,
-    paymentId: Sequelize.STRING,
-    status: Sequelize.STRING
-});
+// const Order = sequelize.define("order", {
+//     id: {
+//         type: Sequelize.INTEGER,
+//         autoIncrement: true,
+//         allowNull: false,
+//         primaryKey: true
+//     },
+//     orderId: Sequelize.STRING,
+//     paymentId: Sequelize.STRING,
+//     status: Sequelize.STRING
+// });
 
-module.exports = Order;
+// module.exports = Order;

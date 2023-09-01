@@ -1,6 +1,6 @@
-const Expenses = require("../models/expenses");
+// const Expenses = require("../models/expenses");
 const User = require("../models/user");
-const sequelize = require("../utils/config");
+// const sequelize = require("../utils/config");
 
 exports.showLeaderBoard = async (req, res) => {
     try {
