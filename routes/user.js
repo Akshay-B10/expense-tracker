@@ -5,9 +5,9 @@ const router = express.Router();
 const userController = require("../controllers/user");
 const userAuth = require("../middleware/auth");
 
-// router.post("/login", userController.userLogIn);
+router.post("/login", userController.userLogIn);
 
-// router.get("/home", userController.userHome);
+router.get("/home", userController.userHome);
 
 // router.post("/add-expense", userAuth.authenticate, userController.addExpense);
 

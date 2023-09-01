@@ -12,10 +12,10 @@ const cors = require("cors");
 
 // const sequelize = require("./utils/config");
 const adminRoutes = require("./routes/admin");
-// const userRoutes = require("./routes/user");
+const userRoutes = require("./routes/user");
 // const premiumRoutes = require("./routes/premium");
 // const passwordRoutes = require("./routes/password");
-// const errorController = require("./controllers/error");
+const errorController = require("./controllers/error");
 
 const User = require("./models/user");
 // const Expenses = require("./models/expenses");
@@ -47,34 +47,11 @@ app.use(adminRoutes);
 
 // app.use("/user/premium", premiumRoutes);
 
-// app.use("/user", userRoutes);
+app.use("/user", userRoutes);
 
 // app.use("/password", passwordRoutes);
 
-// app.use(errorController.getError404);
-
-// Relations
-
-// User.hasMany(Expenses);
-// Expenses.belongsTo(User, {
-//     constraints: true,
-//     onDelete: "CASCADE"
-// });
-// User.hasMany(Order);
-// Order.belongsTo(User, {
-//     constraints: true,
-//     onDelete: "CASCADE"
-// });
-// User.hasMany(ForgotPasswordRequest);
-// ForgotPasswordRequest.belongsTo(User, {
-//     constraints: true,
-//     onDelete: "CASCADE"
-// });
-// User.hasMany(Downloads);
-// Downloads.belongsTo(User, {
-//     constraints: true,
-//     onDelete: "CASCADE"
-// });
+app.use(errorController.getError404);
 
 mongoose
     .connect(process.env.DB_URL)

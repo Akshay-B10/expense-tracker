@@ -2,11 +2,10 @@ const path = require("path");
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const sequelize = require("../utils/config");
 
 const User = require("../models/user");
-const Expenses = require("../models/expenses");
-const Downloads = require("../models/downloads");
+// const Expenses = require("../models/expenses");
+// const Downloads = require("../models/downloads");
 
 const UserServices = require("../services/user-services");
 const S3Services = require("../services/S3-services");
@@ -27,9 +26,7 @@ exports.userLogIn = async (req, res) => {
             throw ("Please enter required credentials");
         }
         const user = await User.findOne({
-            where: {
-                email: email
-            }
+            email: email
         });
 
         // Invalid email
@@ -53,7 +50,7 @@ exports.userLogIn = async (req, res) => {
         return res.json({
             success: true,
             message: "Successfully logged in",
-            token: generateToken(user.id)
+            token: generateToken(user._id)
         });
     } catch (err) {
         res.status(500).json({
@@ -67,163 +64,163 @@ exports.userHome = (req, res) => {
     res.sendFile(path.join(__dirname, "../", "views", "home.html"));
 };
 
-exports.addExpense = async (req, res) => {
-    try{
-        const t = await sequelize.transaction();
-        try {
-            const { amount, desc, category } = req.body;
-            const expense = await Expenses.create({
-                amount: amount,
-                description: desc,
-                category: category,
-                userId: req.user.id
-            }, {
-                transaction: t
-            });
-            await User.update({
-                totalAmount: req.user.totalAmount + +amount
-            }, {
-                where: {
-                    id: req.user.id
-                },
-                transaction: t
-            });
-            await t.commit();
-            res.json(expense);
-        } catch (err) {
-            console.log(err);
-            await t.rollback();
-            throw err;
-        }
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: "Something went wrong"
-        });
-    }
-};
+// exports.addExpense = async (req, res) => {
+//     try{
+//         const t = await sequelize.transaction();
+//         try {
+//             const { amount, desc, category } = req.body;
+//             const expense = await Expenses.create({
+//                 amount: amount,
+//                 description: desc,
+//                 category: category,
+//                 userId: req.user.id
+//             }, {
+//                 transaction: t
+//             });
+//             await User.update({
+//                 totalAmount: req.user.totalAmount + +amount
+//             }, {
+//                 where: {
+//                     id: req.user.id
+//                 },
+//                 transaction: t
+//             });
+//             await t.commit();
+//             res.json(expense);
+//         } catch (err) {
+//             console.log(err);
+//             await t.rollback();
+//             throw err;
+//         }
+//     } catch (err) {
+//         res.status(500).json({
+//             success: false,
+//             message: "Something went wrong"
+//         });
+//     }
+// };
 
-exports.getAllExpenses = async (req, res) => {
-    try {
-        const expenses = await Expenses.findAll({
-            where: {
-                userId: req.user.id
-            }
-        });
-        res.json({
-            expenses,
-            isPremium: req.user.isPremium
-        });
-    } catch (err) {
-        console.log(err);
-    }
-};
+// exports.getAllExpenses = async (req, res) => {
+//     try {
+//         const expenses = await Expenses.findAll({
+//             where: {
+//                 userId: req.user.id
+//             }
+//         });
+//         res.json({
+//             expenses,
+//             isPremium: req.user.isPremium
+//         });
+//     } catch (err) {
+//         console.log(err);
+//     }
+// };
 
-exports.deleteExpense = async (req, res) => {
-    try {
-        const t = await sequelize.transaction();
-        try {
-            const id = req.query.id;
-            const expense = await Expenses.findByPk(id);
-            if (expense.userId !== req.user.id) {
-                throw ("Expense cannot be deleted");
-            }
-            await User.update({
-                totalAmount: req.user.totalAmount - +expense.amount
-            }, {
-                where: {
-                    id: req.user.id
-                },
-                transaction: t
-            });
-            await expense.destroy({
-                transaction: t
-            });
-            await t.commit();
-            res.json({
-                success: true,
-                message: "Deleted"
-            });
-        } catch (err) {
-            await t.rollback();
-            throw err;
-        }
-    } catch (err) {
-        res.status(500).json({
-            message: err
-        });
-    }
-};
+// exports.deleteExpense = async (req, res) => {
+//     try {
+//         const t = await sequelize.transaction();
+//         try {
+//             const id = req.query.id;
+//             const expense = await Expenses.findByPk(id);
+//             if (expense.userId !== req.user.id) {
+//                 throw ("Expense cannot be deleted");
+//             }
+//             await User.update({
+//                 totalAmount: req.user.totalAmount - +expense.amount
+//             }, {
+//                 where: {
+//                     id: req.user.id
+//                 },
+//                 transaction: t
+//             });
+//             await expense.destroy({
+//                 transaction: t
+//             });
+//             await t.commit();
+//             res.json({
+//                 success: true,
+//                 message: "Deleted"
+//             });
+//         } catch (err) {
+//             await t.rollback();
+//             throw err;
+//         }
+//     } catch (err) {
+//         res.status(500).json({
+//             message: err
+//         });
+//     }
+// };
 
-exports.downloadPrevReport = async (req, res) => {
-    try {
-        const id = req.query.id;
-        const download = await Downloads.findByPk(id);
-        res.json({
-            success: true,
-            fileUrl : download.fileUrl
-        });
-    } catch (err) {
-        res.status(500).json({
-            message: "Something went wrong",
-            success: false
-        });
-    }
-}
+// exports.downloadPrevReport = async (req, res) => {
+//     try {
+//         const id = req.query.id;
+//         const download = await Downloads.findByPk(id);
+//         res.json({
+//             success: true,
+//             fileUrl : download.fileUrl
+//         });
+//     } catch (err) {
+//         res.status(500).json({
+//             message: "Something went wrong",
+//             success: false
+//         });
+//     }
+// }
 
-exports.downloadReport = async (req, res) => {
-    try {
-        const id = req.user.id;
-        const expenses = await UserServices.getUserExpenses(req);
-        const stringifiedExpenses = JSON.stringify(expenses);
-        const fileName = `expenses${id}_${new Date}.txt`;
-        const fileUrl = await S3Services.uploadToS3(fileName, stringifiedExpenses);
-        const download = await Downloads.create({
-            fileUrl: fileUrl,
-            userId: id
-        });
-        res.status(201).json({
-            success: true,
-            fileUrl: fileUrl,
-            download
-        });
-    } catch (err) {
-        res.status(500).json({
-            err,
-            message: "Something went wrong",
-            success: false
-        });
-    }
-};
+// exports.downloadReport = async (req, res) => {
+//     try {
+//         const id = req.user.id;
+//         const expenses = await UserServices.getUserExpenses(req);
+//         const stringifiedExpenses = JSON.stringify(expenses);
+//         const fileName = `expenses${id}_${new Date}.txt`;
+//         const fileUrl = await S3Services.uploadToS3(fileName, stringifiedExpenses);
+//         const download = await Downloads.create({
+//             fileUrl: fileUrl,
+//             userId: id
+//         });
+//         res.status(201).json({
+//             success: true,
+//             fileUrl: fileUrl,
+//             download
+//         });
+//     } catch (err) {
+//         res.status(500).json({
+//             err,
+//             message: "Something went wrong",
+//             success: false
+//         });
+//     }
+// };
 
-exports.showLimitedDownloads = async (req, res) => {
-    try {
-        const limit = +req.query.rowsPerPage;
-        const page = +req.query.page;
-        const downloads = await Downloads.findAndCountAll({
-            where: {
-                userId: req.user.id
-            },
-            offset: (page - 1) * limit,
-            limit: limit,
-            order: [
-                ["createdAt", "DESC"]
-            ]
-        });
-        const lastPage = Math.ceil(downloads.count / limit);
-        const prevPage = page - 1;
-        const nextPage = page + 1;
-        res.json({
-            downloads: downloads.rows,
-            lastPage: lastPage,
-            prevPage: prevPage,
-            currentPage: page,
-            nextPage: nextPage,
-            total: downloads.count
-        });
-    } catch (err) {
-        res.status(500).json({
-            message: "Something went wrong"
-        });
-    }
-};
+// exports.showLimitedDownloads = async (req, res) => {
+//     try {
+//         const limit = +req.query.rowsPerPage;
+//         const page = +req.query.page;
+//         const downloads = await Downloads.findAndCountAll({
+//             where: {
+//                 userId: req.user.id
+//             },
+//             offset: (page - 1) * limit,
+//             limit: limit,
+//             order: [
+//                 ["createdAt", "DESC"]
+//             ]
+//         });
+//         const lastPage = Math.ceil(downloads.count / limit);
+//         const prevPage = page - 1;
+//         const nextPage = page + 1;
+//         res.json({
+//             downloads: downloads.rows,
+//             lastPage: lastPage,
+//             prevPage: prevPage,
+//             currentPage: page,
+//             nextPage: nextPage,
+//             total: downloads.count
+//         });
+//     } catch (err) {
+//         res.status(500).json({
+//             message: "Something went wrong"
+//         });
+//     }
+// };
