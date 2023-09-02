@@ -191,15 +191,15 @@ function showDownload(download) {
     }
     const li = document.createElement("li");
     li.className = "list-group-item list-group-item-info";
-    li.setAttribute("value", download.id);
-    li.appendChild(document.createTextNode(`${download.createdAt.slice(0, 10)}`));
+    li.setAttribute("value", download._id);
+    li.appendChild(document.createTextNode(`Expense: ${download.createdAt.toString().slice(0, 10)} - ${download._id.slice(-10)}`));
 
     // Show download button
-    const delBtn = document.createElement("input");
-    delBtn.setAttribute("type", "button");
-    delBtn.setAttribute("value", "download");
-    delBtn.className = "btn btn-outline-light btn-sm mx-3";
-    li.appendChild(delBtn);
+    const dlBtn = document.createElement("input");
+    dlBtn.setAttribute("type", "button");
+    dlBtn.setAttribute("value", "download");
+    dlBtn.className = "btn btn-outline-light btn-sm mx-3";
+    li.appendChild(dlBtn);
 
     downloadUl.appendChild(li);
 };
@@ -231,6 +231,7 @@ async function downloadReport(event) {
             a.click();
 
             // Show in downloads
+            console.log(res.data);
             showDownload(res.data.download);
         } else {
             throw (res.data.message);

@@ -45,10 +45,6 @@ exports.sendMailToUser = async (req, res) => {
             userId: req.user
         });
         await newRequest.save();
-        // ForgotPasswordRequest.create({
-        //     uuid: uuid,
-        //     userId: req.user.id
-        // });
         await transEmailApi.sendTransacEmail({
             sender,
             to: reciever,
@@ -85,9 +81,6 @@ exports.uuidValidation = async (req, res) => {
         }
         passReq.isActive = false;
         await passReq.save();
-        // await passReq.update({
-        //     isActive: false
-        // });
         res.sendFile(path.join(__dirname, "../", "views", "new-password.html"));
     } catch (err) {
         res.status(500).json(err);
@@ -107,13 +100,6 @@ exports.setNewPassword = async (req, res) => {
         await User.findByIdAndUpdate(req.user._id, {
             password: hash
         });
-        // await User.update({
-        //     password: hash
-        // }, {
-        //     where: {
-        //         id: req.user.id
-        //     }
-        // });
         res.json({
             succes: true,
             message: "Password changed successfully!"

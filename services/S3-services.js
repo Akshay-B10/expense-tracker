@@ -27,6 +27,6 @@ exports.uploadToS3 = async (fileName, data) => {
         });
     } catch (err) {
         console.log(err);
-        return err;
+        throw (err);
     }
 };

@@ -10,7 +10,6 @@ const cors = require("cors");
 // const helmet = require("helmet");
 // const morgan = require("morgan");
 
-// const sequelize = require("./utils/config");
 const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/user");
 const premiumRoutes = require("./routes/premium");

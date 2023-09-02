@@ -5,9 +5,8 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
 const Expense = require("../models/expense");
-// const Downloads = require("../models/downloads");
+const Download = require("../models/download");
 
-const UserServices = require("../services/user-services");
 const S3Services = require("../services/S3-services");
 
 const secretKey = process.env.SECRET_TOKEN;
@@ -105,8 +104,6 @@ exports.deleteExpense = async (req, res) => {
     try {
         const id = req.query.id;
         const expense = await Expense.findById(id);
-        console.log(expense.userId);
-        console.log(req.user._id);
         if (expense.userId.toString() !== req.user._id.toString()) {
             throw ("Expense cannot be deleted");
         }
@@ -124,75 +121,84 @@ exports.deleteExpense = async (req, res) => {
     }
 };
 
-// exports.downloadPrevReport = async (req, res) => {
-//     try {
-//         const id = req.query.id;
-//         const download = await Downloads.findByPk(id);
-//         res.json({
-//             success: true,
-//             fileUrl : download.fileUrl
-//         });
-//     } catch (err) {
-//         res.status(500).json({
-//             message: "Something went wrong",
-//             success: false
-//         });
-//     }
-// }
+exports.downloadPrevReport = async (req, res) => {
+    try {
+        const id = req.query.id;
+        const download = await Download.findById(id);
+        res.json({
+            success: true,
+            fileUrl: download.fileUrl
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "Something went wrong",
+            success: false
+        });
+    }
+};
 
-// exports.downloadReport = async (req, res) => {
-//     try {
-//         const id = req.user.id;
-//         const expenses = await UserServices.getUserExpenses(req);
-//         const stringifiedExpenses = JSON.stringify(expenses);
-//         const fileName = `expenses${id}_${new Date}.txt`;
-//         const fileUrl = await S3Services.uploadToS3(fileName, stringifiedExpenses);
-//         const download = await Downloads.create({
-//             fileUrl: fileUrl,
-//             userId: id
-//         });
-//         res.status(201).json({
-//             success: true,
-//             fileUrl: fileUrl,
-//             download
-//         });
-//     } catch (err) {
-//         res.status(500).json({
-//             err,
-//             message: "Something went wrong",
-//             success: false
-//         });
-//     }
-// };
+exports.downloadReport = async (req, res) => {
+    try {
+        const id = req.user._id;
+        const expenses = await Expense.find({
+            userId: id
+        });
+        const stringifiedExpenses = JSON.stringify(expenses);
+        const fileName = `expenses${id}_${new Date}.txt`;
+        const fileUrl = await S3Services.uploadToS3(fileName, stringifiedExpenses);
+        const download = new Download({
+            fileUrl: fileUrl,
+            fileName: fileName,
+            userId: req.user
+        });
+        const downloadObj = await download.save();
+        const reqData = {
+            _id: downloadObj._id,
+            fileUrl: downloadObj.fileUrl,
+            fileName: downloadObj.fileName,
+            createdAt: downloadObj.createdAt,
+        };
+        res.status(201).json({
+            success: true,
+            fileUrl: fileUrl,
+            fileName: fileName,
+            download: reqData
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            err,
+            message: "Something went wrong",
+            success: false
+        });
+    }
+};
 
-// exports.showLimitedDownloads = async (req, res) => {
-//     try {
-//         const limit = +req.query.rowsPerPage;
-//         const page = +req.query.page;
-//         const downloads = await Downloads.findAndCountAll({
-//             where: {
-//                 userId: req.user.id
-//             },
-//             offset: (page - 1) * limit,
-//             limit: limit,
-//             order: [
-//                 ["createdAt", "DESC"]
-//             ]
-//         });
-//         const lastPage = Math.ceil(downloads.count / limit);
-//         const prevPage = page - 1;
-//         const nextPage = page + 1;
-//         res.json({
-//             downloads: downloads.rows,
-//             lastPage: lastPage,
-//             prevPage: prevPage,
-//             currentPage: page,
-//             nextPage: nextPage,
-//             total: downloads.count
-//         });
-//     } catch (err) {
-//         res.status(500).json({
-//             message: "Something went wrong"
-//         });
-//     }
-// };
+exports.showLimitedDownloads = async (req, res) => {
+    try {
+        const limit = +req.query.rowsPerPage;
+        const page = +req.query.page;
+        const downloads = await Download
+            .find({
+                userId: req.user._id
+            })
+            .sort({
+                createdAt: -1
+            });
+        const lastPage = Math.ceil(downloads.length / limit);
+        const prevPage = page - 1;
+        const nextPage = page + 1;
+        res.json({
+            downloads: downloads.slice((page - 1) * limit, (page - 1) * limit + limit),
+            lastPage: lastPage,
+            prevPage: prevPage,
+            currentPage: page,
+            nextPage: nextPage,
+            total: downloads.length
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: "Something went wrong"
+        });
+    }
+};
